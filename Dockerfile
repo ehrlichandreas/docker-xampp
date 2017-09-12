@@ -6,6 +6,7 @@ ENV XAMPP_VERSION 5.6.31
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update --fix-missing
 RUN apt-get -y install apt-utils
+RUN apt-get update --fix-missing
 
 # curl is needed to download the xampp installer, net-tools provides netstat command for xampp
 RUN apt-get -y install curl net-tools bash wget nano vim less --no-install-recommends
@@ -14,6 +15,7 @@ RUN apt-get -y install curl net-tools bash wget nano vim less --no-install-recom
 RUN curl -o xampp-linux-installer.run "https://downloadsapachefriends.global.ssl.fastly.net/xampp-files/${XAMPP_VERSION}/xampp-linux-x64-${XAMPP_VERSION}-0-installer.run?from_af=true"
 RUN chmod +x xampp-linux-installer.run
 RUN bash -c './xampp-linux-installer.run'
+RUN rm -rf './xampp-linux-installer.run'
 RUN ln -sf /opt/lampp/lampp /usr/bin/lampp
 
 # Enable XAMPP web interface(remove security checks)
@@ -46,6 +48,9 @@ RUN sed -ri 's/PermitRootLogin without-password/PermitRootLogin yes/g' /etc/ssh/
 # Set root password
 # password hash generated using this command: openssl passwd -1 -salt xampp root
 RUN sed -ri 's/root\:\*/root\:\$1\$xampp\$5\/7SXMYAMmS68bAy94B5f\./g' /etc/shadow
+
+# write sh alias
+RUN echo 'alias la="ls -alF"' >> /root/.bashrc
 
 RUN apt-get clean
 VOLUME [ "/var/log/mysql/", "/var/log/apache2/" ]
